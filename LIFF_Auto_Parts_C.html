@@ -187,7 +187,7 @@ function App() {
     setSending(true);
     try {
       // ส่งข้อมูลไป Railway backend
-      await fetch("https://YOUR_RAILWAY_URL/submit", {
+      await fetch("https://loyal-adventure-production.up.railway.app/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
