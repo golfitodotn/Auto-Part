@@ -28,7 +28,7 @@ select option { background: #fff; color: #111; }
 
 
 /* ── LIFF Config ── ปรับ LIFF_ID ก่อน deploy ── */
-const LIFF_ID = "2009894434-wrQeGcC1"; // 👈 เปลี่ยนตรงนี้
+const LIFF_ID = "YOUR_LIFF_ID"; // 👈 เปลี่ยนตรงนี้
 
 const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
   "accentColor": "#1e3a8a",
@@ -197,7 +197,7 @@ function App() {
       if (photos.length > 0) lines.push(`📷 แนบรูป ${photos.length} รูป`);
       const msg = lines.join("\n");
 
-      // ใช้ profile ที่ดึงมาตอน init แล้ว
+      // userId จาก profile ที่ดึงมาตอน init
       const userId = profile ? profile.userId : null;
 
       // 1. ลูกค้าส่งข้อความเข้า OA inbox (ต้องเปิดจาก OA)
@@ -205,7 +205,7 @@ function App() {
         await liff.sendMessages([{ type: "text", text: msg }]);
       }
 
-      // 2. Bot ตอบกลับลูกค้า + แจ้ง Admin ผ่าน Railway
+      // 2. Bot ตอบกลับลูกค้า + แจ้ง Admin
       await fetch("https://loyal-adventure-production.up.railway.app/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
