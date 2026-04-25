@@ -28,7 +28,7 @@ select option { background: #fff; color: #111; }
 
 
 /* ── LIFF Config ── ปรับ LIFF_ID ก่อน deploy ── */
-const LIFF_ID = "YOUR_LIFF_ID"; // 👈 เปลี่ยนตรงนี้
+const LIFF_ID = "2009894434-wrQeGcC1"; // 👈 เปลี่ยนตรงนี้
 
 const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
   "accentColor": "#1e3a8a",
@@ -186,25 +186,21 @@ function App() {
     setError("");
     setSending(true);
     try {
-      // ส่งข้อมูลไป Railway backend
-      await fetch("https://auto-part-production.up.railway.app/submit", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          brand, model, year, part, note,
-          photos: photos.length
-        })
-      });
+      const lines = [
+        `🚗 รถ: ${brand}${model ? ` ${model}` : ""} ปี ${year}`,
+        `🔧 อะไหล่: ${part}`,
+      ];
+      if (note) lines.push(`📝 หมายเหตุ: ${note}`);
+      if (photos.length > 0) lines.push(`📷 แนบรูป ${photos.length} รูป`);
+      const msg = lines.join("\n");
 
-      // ส่งใน LINE ด้วย (ถ้าเปิดใน LINE app)
       if (liff.isInClient()) {
-        await liff.sendMessages([{
-          type: "text",
-          text: `🔧 ส่งคำขออะไหล่แล้ว: ${part} (${brand} ปี ${year})`
-        }]);
+        await liff.sendMessages([{ type: "text", text: msg }]);
+      } else {
+        console.warn("ไม่ได้เปิดใน LINE app — ข้อความจะไม่ถูกส่ง");
       }
     } catch (e) {
-      console.warn("Error:", e.message);
+      console.warn("sendMessages failed:", e.message);
     }
     setSending(false);
     setSubmitted(true);
