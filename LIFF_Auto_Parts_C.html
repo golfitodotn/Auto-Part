@@ -194,19 +194,10 @@ function App() {
       if (photos.length > 0) lines.push(`📷 แนบรูป ${photos.length} รูป`);
       const msg = lines.join("\n");
 
-      // ดึง userId ของลูกค้า
-      let userId = null;
-      try {
-        const profile = await liff.getProfile();
-        userId = profile.userId;
-      } catch(e) {}
-
-      // ส่งข้อมูลไป Railway → Push กลับหาลูกค้าใน OA + แจ้ง Admin
-      await fetch("https://auto-part-production.up.railway.app/submit", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ brand, model, year, part, note, photos: photos.length, userId })
-      });
+      // ส่งข้อความเข้า OA inbox
+      if (liff.isInClient()) {
+        await liff.sendMessages([{ type: "text", text: msg }]);
+      }
 
     } catch (e) {
       console.warn("Error:", e.message);
