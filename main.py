@@ -58,7 +58,7 @@ def submit():
 
     if ADMIN_USER_ID:
         push_message(ADMIN_USER_ID, [
-            {"type": "text", "text": f"📥 มีคำขออะไหล่ใหม่!\n\n{order_msg}"}
+            {"type": "text", "text": f"📥 NEW ORDER!!!!!!\n\n{order_msg}"}
         ])
 
     return jsonify({"status": "ok"})
