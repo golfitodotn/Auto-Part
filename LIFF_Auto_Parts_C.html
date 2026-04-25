@@ -150,15 +150,18 @@ function App() {
     liff.init({ liffId: LIFF_ID })
       .then(async () => {
         setLiffReady(true);
-        if (liff.isLoggedIn()) {
+        if (!liff.isLoggedIn()) {
+          liff.login();
+          return;
+        }
+        try {
           const p = await liff.getProfile();
           setProfile(p);
-        } else {
-          liff.login();
+        } catch(e) {
+          console.warn("getProfile failed:", e.message);
         }
       })
       .catch(err => {
-        // ทำงานต่อได้แม้ไม่มี LIFF (สำหรับ dev/preview)
         console.warn("LIFF init failed (preview mode):", err.message);
         setLiffReady(true);
       });
