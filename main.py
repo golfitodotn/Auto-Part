@@ -10,7 +10,7 @@ CHANNEL_ACCESS_TOKEN = os.environ.get("LINE_TOKEN")
 ADMIN_USER_ID = os.environ.get("LINE_ADMIN_ID")
 
 def push_message(to, msg):
-    requests.post(
+    res = requests.post(
         "https://api.line.me/v2/bot/message/push",
         headers={
             "Content-Type": "application/json",
@@ -21,10 +21,13 @@ def push_message(to, msg):
             "messages": [{"type": "text", "text": msg}]
         }
     )
+    print(f"LINE API response: {res.status_code} {res.text}")
+    return res
 
 @app.route("/submit", methods=["POST"])
 def submit():
     data = request.get_json()
+    print(f"Received data: {data}")
 
     brand = data.get("brand", "")
     model = data.get("model", "")
@@ -32,7 +35,6 @@ def submit():
     part = data.get("part", "")
     note = data.get("note", "")
     photos = data.get("photos", 0)
-    user_id = data.get("userId")
 
     lines = [
         f"🚗 รถ: {brand}{' ' + model if model else ''} ปี {year}",
@@ -45,11 +47,9 @@ def submit():
 
     msg = "\n".join(lines)
 
-    # ส่งหาลูกค้าใน OA
-    if user_id:
-        push_message(user_id, f"✅ ได้รับคำขอแล้วครับ!\n\n{msg}\n\nร้านจะติดต่อกลับภายใน 30 นาที – 2 ชั่วโมง")
+    print(f"Sending to ADMIN_USER_ID: {ADMIN_USER_ID}")
+    print(f"TOKEN exists: {bool(CHANNEL_ACCESS_TOKEN)}")
 
-    # แจ้ง Admin
     if ADMIN_USER_ID:
         push_message(ADMIN_USER_ID, f"📥 มีคำขออะไหล่ใหม่!\n\n{msg}")
 
