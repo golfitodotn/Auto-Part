@@ -194,14 +194,8 @@ function App() {
       if (photos.length > 0) lines.push(`📷 แนบรูป ${photos.length} รูป`);
       const msg = lines.join("\n");
 
-      // ดึง userId ลูกค้า
-      let userId = null;
-      try {
-        const p = await liff.getProfile();
-        userId = p.userId;
-      } catch(e) {
-        console.warn("getProfile failed:", e.message);
-      }
+      // ใช้ profile ที่ดึงมาตอน init แล้ว
+      const userId = profile ? profile.userId : null;
 
       // ส่งข้อมูลไป Railway → Bot ตอบกลับลูกค้า + แจ้ง Admin
       await fetch("https://loyal-adventure-production.up.railway.app/submit", {
