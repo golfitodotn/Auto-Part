@@ -9,25 +9,9 @@ CORS(app)
 CHANNEL_ACCESS_TOKEN = os.environ.get("LINE_TOKEN")
 ADMIN_USER_ID = os.environ.get("LINE_ADMIN_ID")
 
-def push_message(to, msg):
-    res = requests.post(
-        "https://api.line.me/v2/bot/message/push",
-        headers={
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {CHANNEL_ACCESS_TOKEN}"
-        },
-        json={
-            "to": to,
-            "messages": [{"type": "text", "text": msg}]
-        }
-    )
-    print(f"LINE API response: {res.status_code} {res.text}")
-    return res
-
 @app.route("/submit", methods=["POST"])
 def submit():
     data = request.get_json()
-    print(f"Received data: {data}")
 
     brand = data.get("brand", "")
     model = data.get("model", "")
@@ -47,11 +31,17 @@ def submit():
 
     msg = "\n".join(lines)
 
-    print(f"Sending to ADMIN_USER_ID: {ADMIN_USER_ID}")
-    print(f"TOKEN exists: {bool(CHANNEL_ACCESS_TOKEN)}")
-
-    if ADMIN_USER_ID:
-        push_message(ADMIN_USER_ID, f"📥 มีคำขออะไหล่ใหม่!\n\n{msg}")
+    requests.post(
+        "https://api.line.me/v2/bot/message/push",
+        headers={
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {CHANNEL_ACCESS_TOKEN}"
+        },
+        json={
+            "to": ADMIN_USER_ID,
+            "messages": [{"type": "text", "text": msg}]
+        }
+    )
 
     return jsonify({"status": "ok"})
 
