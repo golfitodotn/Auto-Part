@@ -9,6 +9,19 @@ CORS(app)
 CHANNEL_ACCESS_TOKEN = os.environ.get("LINE_TOKEN")
 ADMIN_USER_ID = os.environ.get("LINE_ADMIN_ID")
 
+def push_message(to, msg):
+    requests.post(
+        "https://api.line.me/v2/bot/message/push",
+        headers={
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {CHANNEL_ACCESS_TOKEN}"
+        },
+        json={
+            "to": to,
+            "messages": [{"type": "text", "text": msg}]
+        }
+    )
+
 @app.route("/submit", methods=["POST"])
 def submit():
     data = request.get_json()
@@ -19,6 +32,7 @@ def submit():
     part = data.get("part", "")
     note = data.get("note", "")
     photos = data.get("photos", 0)
+    user_id = data.get("userId")
 
     lines = [
         f"🚗 รถ: {brand}{' ' + model if model else ''} ปี {year}",
@@ -31,17 +45,13 @@ def submit():
 
     msg = "\n".join(lines)
 
-    requests.post(
-        "https://api.line.me/v2/bot/message/push",
-        headers={
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {CHANNEL_ACCESS_TOKEN}"
-        },
-        json={
-            "to": ADMIN_USER_ID,
-            "messages": [{"type": "text", "text": msg}]
-        }
-    )
+    # ส่งหาลูกค้าใน OA
+    if user_id:
+        push_message(user_id, f"✅ ได้รับคำขอแล้วครับ!\n\n{msg}\n\nร้านจะติดต่อกลับภายใน 30 นาที – 2 ชั่วโมง")
+
+    # แจ้ง Admin
+    if ADMIN_USER_ID:
+        push_message(ADMIN_USER_ID, f"📥 มีคำขออะไหล่ใหม่!\n\n{msg}")
 
     return jsonify({"status": "ok"})
 
