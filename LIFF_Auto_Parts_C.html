@@ -197,7 +197,12 @@ function App() {
       // ใช้ profile ที่ดึงมาตอน init แล้ว
       const userId = profile ? profile.userId : null;
 
-      // ส่งข้อมูลไป Railway → Bot ตอบกลับลูกค้า + แจ้ง Admin
+      // 1. ลูกค้าส่งข้อความเข้า OA inbox (ต้องเปิดจาก OA)
+      if (liff.isInClient()) {
+        await liff.sendMessages([{ type: "text", text: msg }]);
+      }
+
+      // 2. Bot ตอบกลับลูกค้า + แจ้ง Admin ผ่าน Railway
       await fetch("https://loyal-adventure-production.up.railway.app/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
